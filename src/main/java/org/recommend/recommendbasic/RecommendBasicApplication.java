@@ -27,7 +27,7 @@ public class RecommendBasicApplication implements CommandLineRunner{
         //fetch all customers
         System.out.println("Customer found with findAll()");
         System.out.println("-----------------------------");
-        for (Customer customer: repository.findByLastName("Smith")){
+        for (Customer customer: repository.findByFirstNameAndLastName("Alice", "Smith")){
             System.out.println(customer);
         }
 
