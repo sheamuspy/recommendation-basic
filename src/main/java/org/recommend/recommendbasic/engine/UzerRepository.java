@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 /**
  * Created by sheamus on 8/14/2017.
  */
-public interface UserRepository extends MongoRepository<User, String> {
+public interface UzerRepository extends MongoRepository<Uzer, String> {
 
 
 }

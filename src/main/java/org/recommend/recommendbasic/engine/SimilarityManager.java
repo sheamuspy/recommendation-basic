@@ -1,5 +1,7 @@
 package org.recommend.recommendbasic.engine;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.*;
 
 /**
@@ -7,7 +9,9 @@ import java.util.*;
  */
 public class SimilarityManager {
 
+    @Autowired
     private SimilarsRepository similarsRepository;
+    @Autowired
     private RaterRepository raterRepository;
 
     public void update(String userId){

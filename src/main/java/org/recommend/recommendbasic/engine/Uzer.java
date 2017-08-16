@@ -5,7 +5,7 @@ import org.springframework.data.annotation.Id;
 /**
  * Created by sheamus on 8/14/2017.
  */
-public class User {
+public class Uzer {
 
     @Id
     public String id;
@@ -13,9 +13,9 @@ public class User {
     public String firstName;
     public String lastName;
 
-    public User(){}
+    public Uzer(){}
 
-    public User(String firstName, String lastName){
+    public Uzer(String firstName, String lastName){
         this.firstName = firstName;
         this.lastName = lastName;
     }

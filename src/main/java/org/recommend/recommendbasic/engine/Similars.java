@@ -1,5 +1,7 @@
 package org.recommend.recommendbasic.engine;
 
+import org.springframework.data.annotation.Id;
+
 import java.util.*;
 
 /**
@@ -7,6 +9,8 @@ import java.util.*;
  */
 public class Similars {
 
+    @Id
+    private String id;
     private String user;
     private HashMap<String, Double> others;
 
