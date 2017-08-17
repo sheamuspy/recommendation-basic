@@ -1,12 +1,14 @@
 package org.recommend.recommendbasic.engine;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.*;
 
 /**
  * Created by sheamus on 8/15/2017.
  */
+@Component
 public class SimilarityManager {
 
     @Autowired
@@ -15,9 +17,9 @@ public class SimilarityManager {
     private RaterRepository raterRepository;
 
     public void update(String userId){
-        List<Rater> userLikes = raterRepository.findByUserAndRating(userId, "like");
+        List<Rater> userLikes = raterRepository.findByUserAndRating(userId, RatingManager.LIKE);
 
-        List<Rater> userDislikes = raterRepository.findByUserAndRating(userId, "dislike");
+        List<Rater> userDislikes = raterRepository.findByUserAndRating(userId, RatingManager.DISLIKE);
 
         Set<Rater> others = new LinkedHashSet<>();
 
@@ -46,8 +48,8 @@ public class SimilarityManager {
     }
 
     private double getSimilarity(Rater r, List<Rater> userDislikes, List<Rater> userLikes) {
-        List<Rater> otherLikes = raterRepository.findByUserAndRating(r.getUser(), "like");
-        List<Rater> otherDislikes = raterRepository.findByUserAndRating(r.getUser(), "dislike");
+        List<Rater> otherLikes = raterRepository.findByUserAndRating(r.getUser(), RatingManager.LIKE);
+        List<Rater> otherDislikes = raterRepository.findByUserAndRating(r.getUser(),RatingManager.DISLIKE );
 
         Set<Rater> unionAll = new HashSet<>();
         unionAll.addAll(userLikes);
