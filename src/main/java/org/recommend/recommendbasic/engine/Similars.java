@@ -2,7 +2,7 @@ package org.recommend.recommendbasic.engine;
 
 import org.springframework.data.annotation.Id;
 
-import java.util.*;
+import java.util.HashMap;
 
 /**
  * Created by sheamus on 8/14/2017.
@@ -15,6 +15,15 @@ public class Similars {
     private HashMap<String, Double> others;
 
     public Similars(){}
+
+    public Similars(String user){
+        this.user = user;
+    }
+
+    public Similars(String user, HashMap<String, Double> others){
+        this.user = user;
+        this.others = others;
+    }
 
     public String getUser() {
         return user;

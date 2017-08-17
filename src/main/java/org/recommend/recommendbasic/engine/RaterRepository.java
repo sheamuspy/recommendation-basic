@@ -14,4 +14,6 @@ public interface RaterRepository extends MongoRepository<Rater, String> {
     public List<Rater> findByUserAndRating(String user, String rating);
     public List<Rater> findByItemAndRating(String item, String rating);
     public List<Rater> findByItem(String item);
+
+    public List<String> findItemByUser(String user);
 }

@@ -58,4 +58,23 @@ public class Rater {
     public void setRating(String rating) {
         this.rating = rating;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (!(obj instanceof Rater)){
+            return super.equals(obj);
+        }
+
+        Rater otherRater = (Rater) obj;
+
+        return this.id.equals(otherRater.getId());
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+
+    }
 }
