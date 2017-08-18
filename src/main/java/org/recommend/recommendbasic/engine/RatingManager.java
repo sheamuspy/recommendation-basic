@@ -15,14 +15,14 @@ public class RatingManager {
 
     private RaterRepository raterRepository;
     private SimilarityManager similarityManager;
-    private SuggestionsManager suggestionsManager;
+    private RecommendationManager recommendationManager;
 
     @Autowired
     public void RatingManger( RaterRepository raterRepository,
-                              SimilarityManager similarityManager, SuggestionsManager suggestionsManager){
+                              SimilarityManager similarityManager, RecommendationManager recommendationManager){
         this.raterRepository = raterRepository;
         this.similarityManager = similarityManager;
-        this.suggestionsManager = suggestionsManager;
+        this.recommendationManager = recommendationManager;
     }
 
     /**
@@ -37,7 +37,7 @@ public class RatingManager {
     public void add(String user, String item, String rating){
         Rater r;
 
-        if ((r = raterRepository.findByUserAndItem(user,user))
+        if ((r = raterRepository.findByUserAndItem(user, item))
                 == null){
             // If there is no existing rating, then add the new rating.
 
@@ -57,7 +57,7 @@ public class RatingManager {
 
         //Update the similarity indices and the suggestion lists
         similarityManager.update(user);
-        suggestionsManager.update(user);
+        recommendationManager.update(user);
     }
 
     /**
@@ -75,7 +75,7 @@ public class RatingManager {
 
             //Update the similarity indices and the suggestion lists
             similarityManager.update(user);
-            suggestionsManager.update(user);
+            recommendationManager.update(user);
         }
     }
 

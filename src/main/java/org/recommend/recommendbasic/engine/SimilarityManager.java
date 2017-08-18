@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class SimilarityManager {
 
     @Autowired
-    private SimilarsRepository similarsRepository;
+    private SimilarityRepository similarityRepository;
     @Autowired
     private RaterRepository raterRepository;
 
@@ -65,20 +65,17 @@ public class SimilarityManager {
                 if (other.getUser().equals(user))
                     continue;
 
-                o.put(other.getUser(), getSimilarity(other, userDislikes, userLikes));
-            }
+                Similarity temp = similarityRepository.findByUserAndOther(user, other.getUser());
 
-            Similars userSimilars = similarsRepository.findByUser(user);
+                // If no similars exists for the given user then create a new one.
+                if (temp == null){
+                    temp =  new Similarity(user, other.getUser());
+                }
 
-            // If no similars exists for the given user then create a new one.
-            if (userSimilars == null){
-                userSimilars =  new Similars(user);
+                temp.setSimilarityIndex(getSimilarity(other, userDislikes, userLikes));
+                similarityRepository.save(temp);
             }
-            userSimilars.setOthers(o);
-            similarsRepository.save(userSimilars);
         }
-
-
     }
 
     /**

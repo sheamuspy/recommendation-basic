@@ -1,31 +1,33 @@
 package org.recommend.recommendbasic;
 
 import org.recommend.recommendbasic.engine.RatingManager;
-import org.recommend.recommendbasic.engine.Suggestions;
-import org.recommend.recommendbasic.engine.SuggestionsRepository;
+import org.recommend.recommendbasic.engine.Recommendation;
+import org.recommend.recommendbasic.engine.RecommendationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 /**
  * Created by sheamus on 8/16/2017.
  */
 
-@Controller
+@RestController
 @RequestMapping("/")
 public class RecommendBasicController {
 
     private RatingManager ratingManager;
-    private SuggestionsRepository suggestionsRepository;
+    private RecommendationRepository recommendationRepository;
 
 
     @Autowired
     public RecommendBasicController(
-            RatingManager ratingManager, SuggestionsRepository suggestionsRepository){
+            RatingManager ratingManager, RecommendationRepository recommendationRepository){
         this.ratingManager = ratingManager;
-        this.suggestionsRepository = suggestionsRepository;
+        this.recommendationRepository = recommendationRepository;
     }
 
 
@@ -47,9 +49,9 @@ public class RecommendBasicController {
     }
 
     @RequestMapping(value = "/{user}", method = RequestMethod.GET)
-    public Suggestions usersRecommendations(@PathVariable("user") String user){
+    public List<Recommendation> usersRecommendations(@PathVariable("user") String user){
 
-                return suggestionsRepository.findByUser(user);
+                return recommendationRepository.findByUser(user);
     }
 
 

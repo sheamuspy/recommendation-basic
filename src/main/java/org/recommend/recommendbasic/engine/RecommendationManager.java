@@ -4,23 +4,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
  * Created by sheamus on 8/15/2017.
  */
 @Component
-public class SuggestionsManager {
+public class RecommendationManager {
 
     @Autowired
     private RaterRepository raterRepository;
     @Autowired
-    private SimilarsRepository similarsRepository;
+    private SimilarityRepository similarityRepository;
     @Autowired
-    private SuggestionsRepository suggestionsRepository;
+    private RecommendationRepository recommendationRepository;
 
 
     /**
@@ -32,7 +32,7 @@ public class SuggestionsManager {
         // Retrieve the given user's likes, dislikes and other users with similar tastes.
         List<Rater> rlikes = raterRepository.findByUserAndRating(user, RatingManager.LIKE);
         List<Rater> rdislikes = raterRepository.findByUserAndRating(user, RatingManager.DISLIKE);
-        Similars userSimilars = similarsRepository.findByUser(user);
+        List<Similarity> similarityPairs = similarityRepository.findByUser(user);
 
         // Replace null values indicating no values with empty lists.
         if (rlikes == null){
@@ -45,28 +45,27 @@ public class SuggestionsManager {
         List<String> likes = rlikes.stream().map(Rater::getItem).collect(Collectors.toList());
         List<String> dislikes = rdislikes.stream().map(Rater::getItem).collect(Collectors.toList());
 
+
+
         // Because this is a collaborative filtering method if there are no similars
         // recommendations will not be made.
-        if (userSimilars == null){
+        if (similarityPairs == null){
             return;
         }
-
-        // Get the similars
-        HashMap<String, Double> others = userSimilars.getOthers();
 
         HashSet<String> itemsLikes = new HashSet<>();
         HashSet<String> itemsDislikes = new HashSet<>();
 
         // Retrieve all the likes and the dislikes of each of the other users.
-        for (String other :
-                others.keySet()) {
+        for (Similarity similarityPair :
+                similarityPairs) {
 
             // If this other person is the same as the given user move one.
-            if (other.equals(user))
+            if (similarityPair.getOther().equals(user))
                 continue;
 
-            List<Rater> tempLike = raterRepository.findByUserAndRating(other, RatingManager.LIKE);
-            List<Rater> tempDislike = raterRepository.findByUserAndRating(other, RatingManager.DISLIKE);
+            List<Rater> tempLike = raterRepository.findByUserAndRating(similarityPair.getOther(), RatingManager.LIKE);
+            List<Rater> tempDislike = raterRepository.findByUserAndRating(similarityPair.getOther(), RatingManager.DISLIKE);
 
             if (tempLike == null) {
                 tempLike = new ArrayList<>(0);
@@ -89,11 +88,8 @@ public class SuggestionsManager {
         unratedByUser.addAll(itemsDislikes);
         unratedByUser.addAll(itemsLikes);
 
-        // Storage for item and its weight (-1.0 - 1.0)
-        HashMap<String, Double> itemsWithWeight = new HashMap<>();
-
         //Delete older recommendations
-        suggestionsRepository.deleteByUser(user);
+        recommendationRepository.deleteByUser(user);
 
         // Find out how likely it is for the given user to like the unrated items
         for (String unratedItem :
@@ -109,8 +105,8 @@ public class SuggestionsManager {
                 rdislikers = new ArrayList<>(0);
             }
 
-            List<String> likers = rlikers.stream().map(Rater::getItem).collect(Collectors.toList());
-            List<String> dislikers = rdislikers.stream().map(Rater::getItem).collect(Collectors.toList());
+            List<String> likers = rlikers.stream().map(Rater::getUser).collect(Collectors.toList());
+            List<String> dislikers = rdislikers.stream().map(Rater::getUser).collect(Collectors.toList());
 
 
             double similarityForLikers = 0;
@@ -118,14 +114,18 @@ public class SuggestionsManager {
 
             for (String liker :
                     likers) {
-                if (others.containsKey(liker)){
-                    similarityForLikers += others.get(liker);
+                Optional<Similarity> si = similarityPairs.stream().filter(s->s.getOther().equals(liker)).findFirst();
+
+                if (si.isPresent()){
+
+                    similarityForLikers += si.get().getSimilarityIndex();
                 }
             }
             for (String disliker :
                     dislikers) {
-                if (others.containsKey(disliker)){
-                    similarityForDislikers += others.get(disliker);
+                Optional<Similarity> si = similarityPairs.stream().filter(s->s.getOther().equals(disliker)).findFirst();
+                if (si.isPresent()){
+                    similarityForDislikers += si.get().getSimilarityIndex();
                 }
             }
 
@@ -135,12 +135,12 @@ public class SuggestionsManager {
 
             double weight = (similarityForLikers-similarityForDislikers)/ (unionOfAll.size() * 1.0);
 
-            itemsWithWeight.put(unratedItem, weight);
+            recommendationRepository.save(new Recommendation(user, unratedItem, weight));
 
         }
 
 
-        suggestionsRepository.save(new Suggestions(user, itemsWithWeight));
+
 
     }
 }
