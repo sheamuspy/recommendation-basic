@@ -51,7 +51,7 @@ public class RecommendBasicController {
     @RequestMapping(value = "/{user}", method = RequestMethod.GET)
     public List<Recommendation> usersRecommendations(@PathVariable("user") String user){
 
-                return recommendationRepository.findByUser(user);
+                return recommendationRepository.findByUserOrderByWeightDesc(user);
     }
 
 
